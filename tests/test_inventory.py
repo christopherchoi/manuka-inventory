@@ -1,0 +1,28 @@
+from data import PRODUCTS, SEED_TRANSACTIONS
+from inventory import dashboard_report, format_carton_retail, inventory_report, sales_report
+
+
+def test_format_carton_retail():
+    assert format_carton_retail(36) == "6 cartons"
+    assert format_carton_retail(51) == "8 cartons + 3 retail"
+    assert format_carton_retail(3) == "3 retail"
+
+
+def test_expected_inventory_results():
+    report = inventory_report(SEED_TRANSACTIONS, PRODUCTS).set_index(["Product", "Location"])
+    assert report.loc[("MGO 100+", "Warehouse"), "Retail quantity"] == 2484
+    assert report.loc[("MGO 100+", "Chris Home"), "Retail quantity"] == 51
+    assert report.loc[("MGO 100+", "Jang Home"), "Retail quantity"] == 36
+    assert report.loc[("MGO 300+", "Warehouse"), "Retail quantity"] == 2244
+    assert report.loc[("MGO 300+", "Chris Home"), "Retail quantity"] == 100
+    assert report.loc[("MGO 300+", "Jang Home"), "Retail quantity"] == 48
+
+
+def test_expected_dashboard_and_sales():
+    dashboard = dashboard_report(SEED_TRANSACTIONS, PRODUCTS).set_index("Product")
+    assert dashboard.loc["MGO 100+", "Current remaining stock"] == "428 cartons + 3 retail"
+    assert dashboard.loc["MGO 300+", "Current remaining stock"] == "398 cartons + 4 retail"
+    sales = sales_report(SEED_TRANSACTIONS, PRODUCTS).set_index("Product")
+    assert sales.loc["MGO 100+", "Sales revenue"] == 1035
+    assert sales.loc["MGO 300+", "Sales revenue"] == 4005
+    assert sales["Sales revenue"].sum() == 5040
