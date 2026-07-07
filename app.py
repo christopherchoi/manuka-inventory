@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hmac
+import importlib
 import os
 from datetime import date
 from pathlib import Path
@@ -8,7 +9,10 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 
+import inventory as inventory_module
 from data import Repository
+
+inventory_module = importlib.reload(inventory_module)
 from inventory import (
     STOCK_LOCATIONS,
     dashboard_report,
