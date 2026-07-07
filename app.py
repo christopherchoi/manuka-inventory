@@ -178,15 +178,26 @@ elif page == "Inventory by Location":
     csv_button(report, "Download inventory CSV", "inventory_by_location.csv")
 
 elif page == "Sales Report":
-    heading("Sales report", "Product-level volume with revenue combined only where appropriate.")
+    heading("Sales report", "Daily sales volume, carton pricing, and revenue by product.")
     report = sales_report(transactions, products)
-    st.metric("Total combined sales revenue", f"${report['Sales revenue'].sum():,.2f}")
-    display = report.drop(columns=["Sold quantity (retail)"]).copy()
-    st.dataframe(display, hide_index=True, use_container_width=True, column_config={
-        "Average selling price / carton": st.column_config.NumberColumn(format="$%.2f"),
-        "Sales revenue": st.column_config.NumberColumn(format="$%.2f"),
-    })
-    csv_button(report, "Download sales report CSV", "sales_report.csv")
+    if report.empty:
+        st.info("No sales transactions yet.")
+    else:
+        report["Date"] = pd.to_datetime(report["Date"]).dt.date
+        min_date, max_date = report["Date"].min(), report["Date"].max()
+        date_range = st.date_input("Sales date range", (min_date, max_date))
+        filtered = report.copy()
+        if len(date_range) == 2:
+            filtered = filtered[(filtered["Date"] >= date_range[0]) & (filtered["Date"] <= date_range[1])]
+
+        st.metric("Total combined sales revenue", f"${filtered['Sales revenue'].sum():,.2f}")
+        display = filtered.drop(columns=["Sold quantity (retail)"]).copy()
+        st.dataframe(display, hide_index=True, use_container_width=True, column_config={
+            "Date": st.column_config.DateColumn(format="YYYY-MM-DD"),
+            "Average selling price / carton": st.column_config.NumberColumn(format="$%.2f"),
+            "Sales revenue": st.column_config.NumberColumn(format="$%.2f"),
+        })
+        csv_button(filtered, "Download sales report CSV", "sales_report.csv")
 
 elif page == "Transaction Log":
     heading("Transaction log", "The complete audit trail for stock and sales.")

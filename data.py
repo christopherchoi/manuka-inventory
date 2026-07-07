@@ -17,7 +17,7 @@ PRODUCTS = [
 ]
 LOCATIONS = [
     {"id": f"00000000-0000-0000-0000-00000000000{i}", "name": name}
-    for i, name in enumerate(["Australia", "Warehouse", "Chris Home", "Jang Home", "Customer", "Service"], start=1)
+    for i, name in enumerate(["Australia", "Warehouse", "Chris Home", "Brian Home", "Customer", "Service"], start=1)
 ]
 
 
@@ -40,8 +40,8 @@ SEED_TRANSACTIONS = [
     _tx("MGO 100+", "sale", 15, "carton", 90, "Chris Home", "Customer", 69, "Sold MGO 100+ cartons", 6),
     _tx("MGO 300+", "service", 2, "retail", 2, "Chris Home", "Service", None, "Service / giveaway", 7),
     _tx("MGO 100+", "service", 3, "retail", 3, "Chris Home", "Service", None, "Service / giveaway", 8),
-    _tx("MGO 300+", "transfer", 8, "carton", 48, "Chris Home", "Jang Home", None, "Moved stock to Jang Home", 9),
-    _tx("MGO 100+", "transfer", 6, "carton", 36, "Chris Home", "Jang Home", None, "Moved stock to Jang Home", 10),
+    _tx("MGO 300+", "transfer", 8, "carton", 48, "Chris Home", "Brian Home", None, "Moved stock to Brian Home", 9),
+    _tx("MGO 100+", "transfer", 6, "carton", 36, "Chris Home", "Brian Home", None, "Moved stock to Brian Home", 10),
 ]
 
 

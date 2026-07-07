@@ -23,8 +23,8 @@ Use a server-side Supabase key because row-level security is enabled and the key
 ## Reports and exports
 
 - Dashboard: stock movement summary by product
-- Inventory by Location: Warehouse, Chris Home, and Jang Home balances
-- Sales Report: per-product quantity, average carton price, and combined revenue
+- Inventory by Location: Warehouse, Chris Home, and Brian Home balances
+- Sales Report: daily per-product sales, average carton price, and combined revenue with date-range filtering
 - Transaction Log: date/product/type/location filters
 - CSV downloads are available on inventory, sales, and log pages
 

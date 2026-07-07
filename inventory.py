@@ -4,13 +4,14 @@ from __future__ import annotations
 
 from collections import defaultdict
 from decimal import Decimal
+from datetime import date
 from typing import Iterable
 
 import pandas as pd
 
 
 RETAIL_PER_CARTON = 6
-STOCK_LOCATIONS = ("Warehouse", "Chris Home", "Jang Home")
+STOCK_LOCATIONS = ("Warehouse", "Chris Home", "Brian Home")
 
 
 def format_carton_retail(quantity_retail: int, retail_per_carton: int = RETAIL_PER_CARTON) -> str:
@@ -76,7 +77,7 @@ def dashboard_report(transactions: list[dict], products: list[dict]) -> pd.DataF
                 "Service quantity": format_carton_retail(service, rpc),
                 "Warehouse stock": format_carton_retail(balances.get((name, "Warehouse"), 0), rpc),
                 "Chris Home stock": format_carton_retail(balances.get((name, "Chris Home"), 0), rpc),
-                "Jang Home stock": format_carton_retail(balances.get((name, "Jang Home"), 0), rpc),
+                "Brian Home stock": format_carton_retail(balances.get((name, "Brian Home"), 0), rpc),
                 "Current remaining stock": format_carton_retail(remaining, rpc),
             }
         )
@@ -102,6 +103,49 @@ def inventory_report(transactions: list[dict], products: list[dict]) -> pd.DataF
 
 
 def sales_report(transactions: list[dict], products: list[dict]) -> pd.DataFrame:
+    product_lookup = {product["name"]: product for product in products}
+    grouped: defaultdict[tuple[date, str], dict[str, Decimal | int]] = defaultdict(
+        lambda: {"sold_retail": 0, "revenue": Decimal("0")}
+    )
+
+    for tx in transactions:
+        if tx["transaction_type"] != "sale":
+            continue
+        tx_date = pd.to_datetime(tx["transaction_date"]).date()
+        key = (tx_date, tx["product"])
+        grouped[key]["sold_retail"] += int(tx["quantity_retail"])
+        grouped[key]["revenue"] += Decimal(str(tx.get("total_amount") or 0))
+
+    columns = [
+        "Date",
+        "Product",
+        "Sold quantity (retail)",
+        "Sold quantity",
+        "Average selling price / carton",
+        "Sales revenue",
+    ]
+    rows = []
+    for (tx_date, product_name), totals in sorted(grouped.items(), key=lambda item: (item[0][0], item[0][1])):
+        product = product_lookup[product_name]
+        sold_retail = int(totals["sold_retail"])
+        revenue = Decimal(totals["revenue"])
+        retail_per_carton = int(product.get("retail_per_carton", RETAIL_PER_CARTON))
+        sold_cartons = Decimal(sold_retail) / Decimal(retail_per_carton)
+        average = revenue / sold_cartons if sold_cartons else Decimal("0")
+        rows.append(
+            {
+                "Date": tx_date,
+                "Product": product_name,
+                "Sold quantity (retail)": sold_retail,
+                "Sold quantity": format_carton_retail(sold_retail, retail_per_carton),
+                "Average selling price / carton": float(average),
+                "Sales revenue": float(revenue),
+            }
+        )
+    return pd.DataFrame(rows, columns=columns)
+
+
+def product_sales_summary(transactions: list[dict], products: list[dict]) -> pd.DataFrame:
     rows = []
     for product in products:
         sales = [tx for tx in transactions if tx["product"] == product["name"] and tx["transaction_type"] == "sale"]
