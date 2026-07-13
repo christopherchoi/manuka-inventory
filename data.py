@@ -21,13 +21,25 @@ LOCATIONS = [
 ]
 
 
-def _tx(product: str, kind: str, quantity: float, unit: str, retail: int, source: str, destination: str, price: float | None, memo: str, tx_id: int) -> dict:
+def _tx(
+    product: str,
+    kind: str,
+    quantity: float,
+    unit: str,
+    retail: int,
+    source: str,
+    destination: str,
+    price: float | None,
+    memo: str,
+    tx_id: int,
+    tx_date: str = "2026-07-05",
+) -> dict:
     return {
-        "id": str(tx_id), "transaction_date": "2026-07-05", "product": product,
+        "id": str(tx_id), "transaction_date": tx_date, "product": product,
         "transaction_type": kind, "quantity": quantity, "unit": unit,
         "quantity_retail": retail, "from_location": source, "to_location": destination,
         "unit_price": price, "total_amount": quantity * price if price is not None else (0 if kind == "service" else None),
-        "memo": memo, "created_at": f"2026-07-05T12:{tx_id:02d}:00+00:00",
+        "memo": memo, "created_at": f"{tx_date}T12:{tx_id:02d}:00+00:00",
     }
 
 
@@ -42,6 +54,8 @@ SEED_TRANSACTIONS = [
     _tx("MGO 100+", "service", 3, "retail", 3, "Chris Home", "Service", None, "Service / giveaway", 8),
     _tx("MGO 300+", "transfer", 8, "carton", 48, "Chris Home", "Brian Home", None, "Moved stock to Brian Home", 9),
     _tx("MGO 100+", "transfer", 6, "carton", 36, "Chris Home", "Brian Home", None, "Moved stock to Brian Home", 10),
+    _tx("MGO 100+", "transfer", 1, "carton", 6, "Warehouse", "Chris Home", None, "Moved 1 carton from Vancouver Warehouse to Chris Home on 2026-07-01", 11, "2026-07-01"),
+    _tx("MGO 300+", "transfer", 1, "carton", 6, "Warehouse", "Chris Home", None, "Moved 1 carton from Vancouver Warehouse to Chris Home on 2026-07-01", 12, "2026-07-01"),
 ]
 
 

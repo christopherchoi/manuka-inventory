@@ -12,11 +12,11 @@ def test_format_carton_retail():
 
 def test_expected_inventory_results():
     report = inventory_report(SEED_TRANSACTIONS, PRODUCTS).set_index(["Product", "Location"])
-    assert report.loc[("MGO 100+", "Warehouse"), "Retail quantity"] == 2484
-    assert report.loc[("MGO 100+", "Chris Home"), "Retail quantity"] == 51
+    assert report.loc[("MGO 100+", "Warehouse"), "Retail quantity"] == 2478
+    assert report.loc[("MGO 100+", "Chris Home"), "Retail quantity"] == 57
     assert report.loc[("MGO 100+", "Brian Home"), "Retail quantity"] == 36
-    assert report.loc[("MGO 300+", "Warehouse"), "Retail quantity"] == 2244
-    assert report.loc[("MGO 300+", "Chris Home"), "Retail quantity"] == 100
+    assert report.loc[("MGO 300+", "Warehouse"), "Retail quantity"] == 2238
+    assert report.loc[("MGO 300+", "Chris Home"), "Retail quantity"] == 106
     assert report.loc[("MGO 300+", "Brian Home"), "Retail quantity"] == 48
 
 
